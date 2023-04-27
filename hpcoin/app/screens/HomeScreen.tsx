@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View, Alert} from 'react-native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store/store';
 import axios from 'axios';
@@ -75,7 +76,10 @@ const HomeScreen = () => {
   const user = useSelector((state: RootState) => state.user);
 
   const [data, setData] = useState([]);
-  const [dataTotal, setDataTotal] = useState();
+  const [dataTotal, setDataTotal] = useState({
+    gross: '',
+    hold: '',
+  });
 
   const renderItem = ({item}: {item: ItemData}) => {
     return <Item item={item} />;
@@ -102,36 +106,27 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (user.token) {
-      try {
-        axios
-          .get(`${endpoint}/home`, {
-            headers: {
-              Authorization: 'Bearer ' + user.token,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-          })
-          .then((response: any) => {
-            if (response.data) {
-              setData(response.data.list_num);
-              setDataTotal(response.data);
-            }
-          })
-          .catch((error: any) => {
-            console.log(error);
-          });
-      } catch (error) {
-        console.error(error);
-      }
+      axios
+        .get(`${endpoint}/home`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((response: any) => {
+          if (response.data) {
+            setData(response.data.list_num);
+            setDataTotal(response.data);
+          }
+        })
+        .catch((error: any) => {
+          Alert.alert('Notification', 'Get data fail');
+          console.log(2222, error);
+        });
     }
-  }, [user]);
-
-  // navigation.navigate('Details')
-
-  console.log('dataTotal', dataTotal);
+  }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <FlatList
         data={headerData}
         renderItem={renderItemHeader}
@@ -140,16 +135,18 @@ const HomeScreen = () => {
       <FlatList data={data} renderItem={renderItem} numColumns={2} />
       <View>
         <Text style={styles.styleTotal}>
-          <b>Gross Total:</b>&nbsp;
+          Gross Total:{dataTotal && dataTotal.gross}
         </Text>
         <Text style={styles.styleTotal2}>
-          <b>Hold Total:</b>&nbsp;
+          Hold Total:{dataTotal && dataTotal.hold}
         </Text>
         <Text style={styles.styleTotal2}>
-          <b>Net Total:</b>&nbsp;
+          Net Total:
+          {dataTotal &&
+            parseInt(dataTotal.gross, 10) - parseInt(dataTotal.hold, 10)}
         </Text>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

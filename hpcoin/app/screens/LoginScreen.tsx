@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import axios from 'axios';
 
-import {View, Text, StyleSheet, TextInput, Button} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Button, Alert} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {useDispatch} from 'react-redux';
@@ -53,8 +53,10 @@ function LoginScreen() {
         })
         .catch((error: any) => {
           console.log(error);
+          Alert.alert('Notification', 'Fail');
         });
     } catch (error) {
+      Alert.alert('Notification', 'Fail');
       console.error(error);
     }
   };

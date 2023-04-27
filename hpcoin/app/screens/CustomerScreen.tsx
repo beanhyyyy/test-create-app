@@ -1,165 +1,122 @@
-import React, {useState} from 'react';
-import {
-  View,
-  TextInput,
-  Modal,
-  TouchableHighlight,
-  Text,
-  StyleSheet,
-  Button,
-} from 'react-native';
-import {RadioButton} from 'react-native-paper';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/no-unstable-nested-components */
+import axios from 'axios';
+import React, {useEffect, useState} from 'react';
+import {View, FlatList, StyleSheet, Button, Text} from 'react-native';
+import {endpoint} from '../contants/api';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/store';
 
-const CustomerScreen = () => {
-  //
-  const [selectedOption, setSelectedOption] = useState('option1');
+function CustomerScreen({navigation}: any) {
+  const user = useSelector((state: RootState) => state.user);
+  const [data, setData] = useState();
 
-  //
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState('');
-  const options = ['Option 1', 'Option 2', 'Option 3'];
+  const dataHeader = [
+    {
+      name: 'Name',
+      hold: 'Hold',
+      gross: 'Gross',
+      net: 'Net',
+    },
+  ];
 
-  const handleOptionPress = (option: any) => {
-    setSelectedValue(option);
-    setModalVisible(false);
-  };
-
-  //
-  const [text, setText] = useState('');
-
-  const handleTextChange = (inputText: any) => {
-    setText(inputText);
-  };
-
-  return (
-    <View>
-      <View style={styles.styleRadio}>
-        <View style={styles.option}>
-          <RadioButton
-            value="option1"
-            status={selectedOption === 'option1' ? 'checked' : 'unchecked'}
-            onPress={() => setSelectedOption('option1')}
-          />
-          <Text style={styles.label}>Option 1</Text>
-        </View>
-        <View style={styles.option}>
-          <RadioButton
-            value="option2"
-            status={selectedOption === 'option2' ? 'checked' : 'unchecked'}
-            onPress={() => setSelectedOption('option2')}
-          />
-          <Text style={styles.label}>Option 2</Text>
-        </View>
-      </View>
-
-      <View style={styles.styleOption}>
-        <TouchableHighlight
-          onPress={() => setModalVisible(true)}
-          underlayColor="white">
-          <TextInput
-            placeholder="Select an option"
-            value={selectedValue}
-            editable={false}
-          />
-        </TouchableHighlight>
-
-        <Modal visible={modalVisible} animationType="slide" transparent={true}>
-          <View style={styles.modalView}>
-            {options.map((option: any) => (
-              <TouchableHighlight
-                key={option}
-                onPress={() => handleOptionPress(option)}
-                underlayColor="gray">
-                <Text style={styles.optionText}>{option}</Text>
-              </TouchableHighlight>
-            ))}
-            <TouchableHighlight
-              onPress={() => setModalVisible(false)}
-              underlayColor="gray">
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableHighlight>
-          </View>
-        </Modal>
-      </View>
-
-      {selectedOption === 'options2' && (
-        <TextInput
-          style={styles.input}
-          onChangeText={handleTextChange}
-          value={text}
-          placeholder="Enter Name"
-        />
-      )}
-
-      <TextInput
-        style={styles.textMultiple}
-        multiline={true}
-        onChangeText={handleTextChange}
-        value={text}
-        placeholder="Enter text here"
-      />
-
-      <View>
-        <Button title="Clear" />
-        <Button title="Create" color="#033076" />
-      </View>
+  const ItemHeader1 = ({item}: any) => (
+    <View style={styles.containerHeader1}>
+      <Text style={styles.textHeader1}>{item.name}</Text>
+      <Text style={styles.textHeader1}>{item.gross}</Text>
+      <Text style={styles.textHeader1}>{item.hold}</Text>
+      <Text style={styles.textHeader1}>{item.net}</Text>
     </View>
   );
-};
+
+  const renderItemHeader1 = ({item}: {item: any}) => {
+    return <ItemHeader1 item={item} />;
+  };
+
+  const ItemHeader = ({item}: any) => (
+    <View style={styles.containerHeader}>
+      <Text style={styles.textHeader}>{item.name}</Text>
+      <Text style={styles.textHeader}>{item.gross}</Text>
+      <Text style={styles.textHeader}>{item.hold}</Text>
+      <Text style={styles.textHeader}>{item.net}</Text>
+    </View>
+  );
+
+  const renderItemHeader = ({item}: {item: any}) => {
+    return <ItemHeader item={item} />;
+  };
+
+  useEffect(() => {
+    if (user.token) {
+      axios
+        .get(`${endpoint}/customer_list`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        })
+        .then((response: any) => {
+          if (response.data) {
+            setData(response.data.customers);
+            console.log(response.data);
+          }
+        })
+        .catch((error: any) => {
+          console.log(2222, error);
+        });
+    }
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.button}>
+        <Button
+          title="Add Customer"
+          color="#033076"
+          onPress={() => navigation.navigate('AddCustomer')}
+        />
+      </View>
+
+      <FlatList
+        data={dataHeader}
+        renderItem={renderItemHeader1}
+        numColumns={1}
+      />
+      <FlatList data={data} renderItem={renderItemHeader} numColumns={1} />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-  option: {
+  container: {},
+  text: {
+    fontSize: 20,
+  },
+  containerHeader: {
+    width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
   },
-  label: {
-    marginLeft: 10,
-  },
-  styleRadio: {
-    marginBottom: 30,
-  },
-  input: {
-    padding: 10,
-    marginBottom: 30,
-    backgroundColor: '#FFF',
-    borderRadius: 5,
-  },
-  textMultiple: {
-    height: 120,
-    borderColor: 'gray',
+  textHeader: {
+    width: '25%',
+    height: 'auto',
+    textAlign: 'center',
     borderWidth: 1,
-    padding: 10,
+    borderColor: 'black',
+  },
+  containerHeader1: {
+    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: '#033076',
+  },
+  textHeader1: {
+    color: 'white',
+    width: '25%',
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: 'black',
+  },
+  button: {
     marginBottom: 30,
-    backgroundColor: '#FFF',
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  optionText: {
-    fontSize: 18,
-    paddingVertical: 10,
-  },
-  cancelText: {
-    fontSize: 18,
-    paddingVertical: 10,
-    color: 'red',
-  },
-  styleOption: {
-    width: '80%',
-    marginBottom: 30,
+    marginTop: 30,
   },
 });
 

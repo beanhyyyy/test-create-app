@@ -9,9 +9,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
-import CustomerScreen from '../screens/CustomerScreen';
+import AddCustomerScreen from '../screens/AddCustomerScreen';
 import LoginScreen from '../screens/LoginScreen';
 import DetailsScreen from '../screens/DetailsScreen';
+import CustomerScreen from '../screens/CustomerScreen';
 
 import {useTheme} from '../theme/useTheme';
 import {RootState} from '../store/store';
@@ -33,6 +34,7 @@ function CustomerStackScreen() {
         headerShown: false,
       }}>
       <CustomerStack.Screen name="Customer" component={CustomerScreen} />
+      <CustomerStack.Screen name="AddCustomer" component={AddCustomerScreen} />
       <CustomerStack.Screen name="Details" component={DetailsScreen} />
     </CustomerStack.Navigator>
   );
