@@ -74,7 +74,7 @@ const AddCustomerScreen = () => {
     try {
       let params = {
         name: selectedValue,
-        order: [text],
+        order: text,
       };
 
       await axios
