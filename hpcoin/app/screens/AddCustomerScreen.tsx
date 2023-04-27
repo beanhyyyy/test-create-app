@@ -100,7 +100,7 @@ const AddCustomerScreen = () => {
     try {
       let params = {
         name: textName,
-        order: [text],
+        order: text,
       };
 
       await axios
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   textMultiple: {
-    height: 120,
+    height: 300,
     borderColor: 'gray',
     borderWidth: 1,
     padding: 10,
